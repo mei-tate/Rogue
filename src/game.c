@@ -22,6 +22,13 @@ static int placePlayerInFirstRoom(Level *level, Player *player) {
                     break;
                 }
             }
+            for (int i = 0; i < level->numOfItems; i++) {
+                Item *item = &level->items[i];
+                if (item->type != ITEM_NONE && item->position.x == x && item->position.y == y) {
+                    occupied = 1;
+                    break;
+                }
+            }
             if (!occupied) {
                 player->position->x = x;
                 player->position->y = y;
@@ -31,6 +38,36 @@ static int placePlayerInFirstRoom(Level *level, Player *player) {
         }
     }
     return 0;
+}
+
+static void showFloorStory(int floor) {
+    static const char *stories[MAX_GAME_LEVELS] = {
+        "The crown pulses beneath the sealed stair.",
+        "A voice in stone counts each footstep.",
+        "Dead kings left their armories unlocked.",
+        "Something vast breathes below.",
+        "Wraiths whisper your name in the dark.",
+        "The Ash Dragon sleeps upon the crown."
+    };
+    int height, width;
+    getmaxyx(stdscr, height, width);
+    int wh = height < 12 ? height - 2 : 12;
+    int ww = width < 60 ? width - 2 : 60;
+    if (wh < 7 || ww < 30) return;
+    WINDOW *window = newwin(wh, ww, (height - wh) / 2, (width - ww) / 2);
+    if (window == NULL) return;
+    box(window, 0, 0);
+    if (has_colors()) wattron(window, COLOR_PAIR(COLOR_PAIR_STATUS) | A_BOLD);
+    mvwprintw(window, 2, 3, "FLOOR %d  |  THE HOLLOW CROWN", floor);
+    if (has_colors()) wattroff(window, COLOR_PAIR(COLOR_PAIR_STATUS) | A_BOLD);
+    mvwaddnstr(window, 5, 3, stories[floor - 1], ww - 6);
+    wattron(window, A_DIM);
+    mvwprintw(window, wh - 2, 3, "Press any key to enter the depths.");
+    wattroff(window, A_DIM);
+    wrefresh(window);
+    wgetch(window);
+    delwin(window);
+    touchwin(stdscr);
 }
 
 void gameLoop(Game *game) {
@@ -49,6 +86,7 @@ void gameLoop(Game *game) {
         getch();
         return;
     }
+    showFloorStory(1);
 
     player = playerSetUp();
     if (player == NULL) {
@@ -95,6 +133,7 @@ void gameLoop(Game *game) {
                     getch();
                     break;
                 }
+                showFloorStory(nextNumber);
                 level->player = player;
                 game->levels[nextNumber - 1] = level;
                 game->currentLevel = nextNumber;

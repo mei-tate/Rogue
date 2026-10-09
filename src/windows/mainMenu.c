@@ -8,22 +8,15 @@ static void drawMenu(WINDOW *window, int selected, char *choices[], int count) {
     box(window, 0, 0);
 
     if (has_colors()) wattron(window, COLOR_PAIR(COLOR_PAIR_STATUS) | A_BOLD);
-    mvwprintw(window, 2, 4, "RRRRR   OOOOO   GGGGG   U   U   EEEEE");
-    mvwprintw(window, 3, 4, "R   R   O   O   G       U   U   E");
-    mvwprintw(window, 4, 4, "RRRRR   O   O   G GGG   U   U   EEEE");
-    mvwprintw(window, 5, 4, "R R     O   O   G   G   U   U   E");
-    mvwprintw(window, 6, 4, "R  RR   OOOOO   GGGGG    UUU    EEEEE");
-    mvwprintw(window, 7, 4, "                                        ");
-    mvwprintw(window, 8, 4, "                 ROGUE");
+    mvwprintw(window, 2, 4, "THE HOLLOW CROWN");
     if (has_colors()) wattroff(window, COLOR_PAIR(COLOR_PAIR_STATUS) | A_BOLD);
-
     wattron(window, A_DIM);
-    mvwprintw(window, 9, 2, "Explore the halls. Survive what waits below.");
+    mvwprintw(window, 4, 4, "Six floors below. One crown to reclaim.");
     wattroff(window, A_DIM);
-    mvwhline(window, 10, 2, ACS_HLINE, width - 4);
+    mvwhline(window, 6, 2, ACS_HLINE, width - 4);
 
     for (int i = 0; i < count; i++) {
-        int row = 12 + i * 2;
+        int row = 9 + i * 2;
         int pair = (i == 0) ? COLOR_PAIR_START : COLOR_PAIR_END;
         if (has_colors()) wattron(window, COLOR_PAIR(pair) | A_BOLD);
         if (i == selected) {
@@ -37,7 +30,7 @@ static void drawMenu(WINDOW *window, int selected, char *choices[], int count) {
     }
 
     wattron(window, A_DIM);
-    mvwprintw(window, height - 3, 2, "Use W/S or UP/DOWN to choose; ENTER to confirm");
+    mvwprintw(window, height - 3, 2, "W/S or arrows to choose; ENTER to confirm");
     wattroff(window, A_DIM);
 
     wrefresh(window);
@@ -59,7 +52,7 @@ int mainMenu(int numberItems, char *choices[]) {
         return QUIT_GAME;
     }
 
-    int windowHeight = 18;
+    int windowHeight = 20;
     int windowWidth = 50;
     int startY = (screenHeight - windowHeight) / 2;
     int startX = (screenWidth - windowWidth) / 2;

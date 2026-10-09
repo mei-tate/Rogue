@@ -16,6 +16,10 @@ int screenSetUp(void) {
         init_pair(COLOR_PAIR_HIGHLIGHT, COLOR_BLACK, COLOR_YELLOW);
         init_pair(COLOR_PAIR_STATUS, COLOR_CYAN, -1);
         init_pair(COLOR_PAIR_HEALTH, COLOR_GREEN, -1);
+        init_pair(COLOR_PAIR_HALL, COLOR_YELLOW, -1);
+        init_pair(COLOR_PAIR_ITEM, COLOR_MAGENTA, -1);
+        init_pair(COLOR_PAIR_MONSTER, COLOR_RED, -1);
+        init_pair(COLOR_PAIR_PLAYER, COLOR_WHITE, -1);
     }
 
     srand((unsigned int)time(NULL));
@@ -23,7 +27,7 @@ int screenSetUp(void) {
 }
 
 int printGameHub(Level *level) {
-    int height, width, row;
+    int height, width;
     Player *player;
 
     if (level == NULL || level->player == NULL) return 0;
@@ -31,25 +35,60 @@ int printGameHub(Level *level) {
     getmaxyx(stdscr, height, width);
     if (height < 2 || width < 1) return 0;
 
-    row = height - 2;
-    attron(COLOR_PAIR(COLOR_PAIR_STATUS) | A_DIM);
-    mvhline(row, 0, ACS_HLINE, width);
-    attroff(COLOR_PAIR(COLOR_PAIR_STATUS) | A_DIM);
+    erase();
+    for (int y = 0; y < level->mapHeight && y < height - 2; y++) {
+        for (int x = 0; x < width; x++) {
+            char tile = level->tiles[y][x];
+            int pair = 0;
+            switch (tile) {
+                case '#': pair = COLOR_PAIR_HALL; break;
+                case 'O': pair = COLOR_PAIR_START; break;
+                case '-': case '|': pair = COLOR_PAIR_STATUS; break;
+                default: break;
+            }
+            if (pair && has_colors()) attron(COLOR_PAIR(pair));
+            mvaddch(y, x, tile);
+            if (pair && has_colors()) attroff(COLOR_PAIR(pair));
+        }
+    }
+    for (int i = 0; i < level->numOfItems; i++) {
+        Item *item = &level->items[i];
+        if (item->type == ITEM_NONE) continue;
+        char symbol = item->type == ITEM_POTION ? '!' :
+            item->type == ITEM_MANA ? '?' : item->type == ITEM_WEAPON ? ')' :
+            item->type == ITEM_ARMOR ? ']' : '$';
+        if (has_colors()) attron(COLOR_PAIR(COLOR_PAIR_ITEM) | A_BOLD);
+        mvaddch(item->position.y, item->position.x, symbol);
+        if (has_colors()) attroff(COLOR_PAIR(COLOR_PAIR_ITEM) | A_BOLD);
+    }
+    for (int i = 0; i < level->numOfMonsters; i++) {
+        Monster *monster = level->monsters[i];
+        if (monster == NULL || !monster->alive) continue;
+        if (has_colors()) attron(COLOR_PAIR(COLOR_PAIR_MONSTER) | A_BOLD);
+        mvaddch(monster->position->y, monster->position->x, monster->symbol);
+        if (has_colors()) attroff(COLOR_PAIR(COLOR_PAIR_MONSTER) | A_BOLD);
+    }
+    if (has_colors()) attron(COLOR_PAIR(COLOR_PAIR_PLAYER) | A_BOLD);
+    mvaddch(player->position->y, player->position->x, '@');
+    if (has_colors()) attroff(COLOR_PAIR(COLOR_PAIR_PLAYER) | A_BOLD);
 
+    attron(COLOR_PAIR(COLOR_PAIR_STATUS) | A_DIM);
+    mvhline(height - 2, 0, ACS_HLINE, width);
+    attroff(COLOR_PAIR(COLOR_PAIR_STATUS) | A_DIM);
     mvhline(height - 1, 0, ' ', width);
     if (has_colors()) attron(COLOR_PAIR(COLOR_PAIR_STATUS) | A_BOLD);
-    mvaddnstr(height - 1, 0, " LVL ", width);
-    if (width >= 9) mvprintw(height - 1, 5, "%d", level->level);
-    if (width >= 23) mvprintw(height - 1, 9, "  HP ");
-    if (width >= 29) {
-        if (has_colors()) attron(COLOR_PAIR(COLOR_PAIR_HEALTH));
-        mvprintw(height - 1, 14, "%d/%d", player->health, player->maxHealth);
-        if (has_colors()) attroff(COLOR_PAIR(COLOR_PAIR_HEALTH));
+    mvprintw(height - 2, 1, " The Hollow Crown  |  Floor %d/%d", level->level, MAX_GAME_LEVELS);
+    if (width >= 96) {
+        mvprintw(height - 1, 1, "HP %d/%d  MP %d/%d  ATK %d  DEF %d  Rank %d  XP %d  Gold %d  Pack %d/%d  I:pack R:rest H:help Q:menu",
+                 player->health, player->maxHealth, player->mana, player->maxMana,
+                 player->attack, player->defense, player->rank, player->exp,
+                 player->gold, player->inventoryCount, INVENTORY_CAPACITY);
+    } else {
+        mvprintw(height - 1, 1, "HP%d/%d MP%d/%d ATK%d DEF%d R%d XP%d $%d P%d/%d",
+                 player->health, player->maxHealth, player->mana, player->maxMana,
+                 player->attack, player->defense, player->rank, player->exp,
+                 player->gold, player->inventoryCount, INVENTORY_CAPACITY);
     }
-    if (width >= 41) mvprintw(height - 1, 27, "  ATK %d", player->attack);
-    if (width >= 55) mvprintw(height - 1, 37, "  DEF %d", player->defense);
-    if (width >= 69) mvprintw(height - 1, 48, "  EXP %d", player->exp);
-    if (width >= 82) mvprintw(height - 1, 62, "  GOLD %d", player->gold);
     if (has_colors()) attroff(COLOR_PAIR(COLOR_PAIR_STATUS) | A_BOLD);
 
     move(player->position->y, player->position->x);
