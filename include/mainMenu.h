@@ -4,7 +4,7 @@
 #include <ncurses.h>
 #include <stdlib.h>
 
-enum {START_GAME, QUIT_GAME};
+enum {START_GAME, SHOW_HELP, QUIT_GAME};
 
 int mainMenu(int numberItems, char * choices[]);
 

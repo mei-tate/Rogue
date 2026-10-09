@@ -10,9 +10,34 @@
 #define COLOR_PAIR_HIGHLIGHT 3
 #define COLOR_PAIR_STATUS 4
 #define COLOR_PAIR_HEALTH 5
+#define COLOR_PAIR_HALL 6
+#define COLOR_PAIR_ITEM 7
+#define COLOR_PAIR_MONSTER 8
+#define COLOR_PAIR_PLAYER 9
 #define MAX_GAME_LEVELS 6
+#define INVENTORY_CAPACITY 10
 
 /************ Struct Definitions ***************/
+
+typedef struct Position {
+    int x;
+    int y;
+} Position;
+
+typedef enum ItemType {
+    ITEM_NONE,
+    ITEM_POTION,
+    ITEM_MANA,
+    ITEM_WEAPON,
+    ITEM_ARMOR,
+    ITEM_GOLD
+} ItemType;
+
+typedef struct Item {
+    Position position;
+    ItemType type;
+    int value;
+} Item;
 
 typedef struct Level{
     char **tiles;
@@ -21,16 +46,12 @@ typedef struct Level{
     struct Room **rooms;
     struct Monster **monsters;
     int numOfMonsters;
+    Item *items;
+    int numOfItems;
     int mapHeight;
     int transitionRequested;
     struct Player *player;
 } Level;
-
-typedef struct Position {
-    int x;
-    int y;
-    // TILE_TYPE tile;
-} Position;
 
 typedef struct Player {
     Position * position;
@@ -41,6 +62,11 @@ typedef struct Player {
     int gold;
     int maxHealth;
     int exp;
+    int rank;
+    int mana;
+    int maxMana;
+    int inventoryCount;
+    Item inventory[INVENTORY_CAPACITY];
     int alive;
     // Room * room;
 } Player;
@@ -56,10 +82,6 @@ typedef struct Monster {
     int alive;
     struct Room *room;
 } Monster;
-
-typedef struct Item {
-    Position position;
-} Item;
 
 typedef struct Room {
     Position position;
@@ -90,6 +112,10 @@ Player *playerSetUp();
 int handleInput(int input, Player *user, Level *level);
 int movePlayer(Position position, Player *user, Level *level);
 int checkPosition(Position position, Player *user, Level *level);
+void showInventory(Player *player);
+int collectItem(Level *level, Player *player, int x, int y);
+int consumeItem(Player *player, ItemType type);
+void awardExperience(Player *player, int amount);
 
 
 // Room functions
@@ -101,6 +127,7 @@ void freeRooms(Room **rooms, int roomCount);
 
 // Monster functions
 int addMonster(Level *level);
+int addItems(Level *level);
 Monster *selectMonster(int level);
 Monster *createMonster(char symbol, int health, int attack, int speed, int defense, int pathfinding);
 int setStartingPosition(Monster *monster, Room *room);

@@ -49,8 +49,10 @@ Monster *selectMonster(int level){
             monster = (rand() % 2) + 1; // Random number between 1 and 2
             break;
         case 4:
-        case 5:
             monster = (rand() % 2) + 2; // Random number between 2 and 3
+            break;
+        case 5:
+            monster = (rand() % 3) + 3; // Troll, wraith, or dragon
             break;
         case 6:
             monster = 4;
@@ -110,6 +112,9 @@ Monster *selectMonster(int level){
         case 4:
         // Dragon
             return createMonster('D',15,5,2,4,1);
+        case 5:
+        // Wraith
+            return createMonster('W',12,4,2,2,1);
         default:
             break;
         }

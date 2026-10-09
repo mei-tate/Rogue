@@ -69,7 +69,18 @@ int drawRoom(Room *room){
 };
 
 
-// Find a shortest route through unused cells. Existing halls cannot be reused.
+static int hasAdjacentHallway(int x, int y, int width, int height) {
+    for (int dy = -1; dy <= 1; dy++) {
+        for (int dx = -1; dx <= 1; dx++) {
+            int nx = x + dx, ny = y + dy;
+            if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+            if ((mvinch(ny, nx) & A_CHARTEXT) == '#') return 1;
+        }
+    }
+    return 0;
+}
+
+// Find a route through blank cells that stays one tile away from existing halls.
 int connectDoors(Position *door1, Position *door2){
     int height, width, cellCount, start, target, head = 0, tail = 0;
     int *queue = NULL, *parent = NULL;
@@ -95,7 +106,7 @@ int connectDoors(Position *door1, Position *door2){
     parent[start] = start;
     queue[tail++] = start;
 
-    // Breadth-first search: corridors may cross only blank cells.
+    // Breadth-first search: keep a full tile of clearance around other halls.
     while (head < tail && !found) {
         int current = queue[head++];
         int x = current % width;
@@ -109,7 +120,8 @@ int connectDoors(Position *door1, Position *door2){
             next = ny * width + nx;
             if (parent[next] != -1) continue;
             tile = mvinch(ny, nx) & A_CHARTEXT;
-            if (next != target && tile != ' ') continue;
+            if (next != target &&
+                (tile != ' ' || hasAdjacentHallway(nx, ny, width, height))) continue;
             parent[next] = current;
             queue[tail++] = next;
             if (next == target) { found = 1; break; }

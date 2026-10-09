@@ -13,6 +13,8 @@ Level *createLevel(int level){
     newLevel->numOfMonsters = 0;
     newLevel->monsters = NULL;
     newLevel->player = NULL;
+    newLevel->items = NULL;
+    newLevel->numOfItems = 0;
     newLevel->tiles = NULL;
     newLevel->rooms = NULL;
     getmaxyx(stdscr, screenHeight, mapWidth);
@@ -33,6 +35,10 @@ Level *createLevel(int level){
     }
 
     if (!addMonster(newLevel)) {
+        freeLevel(newLevel);
+        return NULL;
+    }
+    if (!addItems(newLevel)) {
         freeLevel(newLevel);
         return NULL;
     }
@@ -166,5 +172,6 @@ void freeLevel(Level *level) {
         }
     }
     free(level->monsters);
+    free(level->items);
     free(level);
 }

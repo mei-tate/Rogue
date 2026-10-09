@@ -1,8 +1,6 @@
-# Rogue
+# The Hollow Crown
 
-A small terminal dungeon game written in C with ncurses. Explore connected rooms, avoid or fight monsters, and keep an eye on your character's status.
-
-The project began as an adaptation of the [Bad Coding Habits Rogue tutorial series](https://www.youtube.com/playlist?list=PLkTXsX7igf8erbWGYT4iSAhpnJLJ0Nk5G) and its [example repository](https://github.com/wadsworj/rogue).
+A terminal roguelike about reclaiming a lost crown from six dangerous floors below an abandoned road. Explore randomized rooms, collect relics, grow stronger, and survive the Ash Dragon.
 
 ## Build and run
 
@@ -13,40 +11,49 @@ make
 ./rogue
 ```
 
-Or build and launch with `make run`. The terminal should be at least 52 columns wide and 22 rows tall. The menu uses ncurses colors when the terminal supports them.
+The terminal should be at least 52 columns wide and 22 rows tall. The game uses ncurses colors when the terminal supports them.
 
-## Main menu
-
-- Use the Up/Down arrow keys or `w`/`s` to select an option.
-- Press Enter to choose **Start Game** or **End Game**.
-- Press `q` or Escape to exit from the menu.
-
-## Game controls
+## Controls
 
 | Key | Action |
 | --- | --- |
-| `w` | Move up |
-| `a` | Move left |
-| `s` | Move down |
-| `d` | Move right |
-| `h` | Open the help screen; this does not advance the turn |
-| `q` | Return to the main menu |
+| `W A S D` or arrow keys | Move |
+| `I` | Open your pack; press an item number to use it |
+| `R` | Rest to recover one mana; enemies take a turn |
+| `H` | Open the field guide |
+| `Q` | Return to the main menu |
 
-Move into a monster to begin combat. The faster fighter attacks first; if speeds tie, the player attacks first. Defense absorbs damage before health and is depleted as it absorbs hits. Defeating a monster ends its retaliation for that exchange.
+Walking into a monster opens a battle window:
 
-Monsters wander within their rooms until the player enters the same room, then pursue the player while staying clear of the doors.
+| Key | Action |
+| --- | --- |
+| `A` | Attack with your weapon |
+| `S` | Arcane strike; costs 2 mana and deals extra damage |
+| `P` | Drink a healing draught |
+| `F` or `Esc` | Try to flee |
 
-## Status bar
+## Items
 
-The bottom bar displays the current level, health, attack, defense, experience, and gold.
+| Symbol | Item | Effect |
+| --- | --- | --- |
+| `!` | Healing draught | Restores up to 10 health |
+| `?` | Aether vial | Restores up to 4 mana |
+| `)` | Whetstone | Permanently raises attack |
+| `]` | Iron sigil | Permanently raises defense |
+| `$` | Gold | Adds directly to your purse |
 
-## Map symbols
+The pack holds ten carried items. Gold does not use pack space. Defeating enemies grants gold and experience; gaining a rank restores health and mana and raises your attack.
+
+## The descent
+
+Each floor has randomly placed, connected rooms and separated hallways. Search for supplies, defeat every monster, then descend through the `O` that appears where the final monster fell. The enemies grow stronger through floor five; the Ash Dragon guards floor six. Clearing the last floor completes the run.
 
 | Symbol | Meaning |
 | --- | --- |
-| `@` | Player |
-| `-`, `\|` | Room walls |
+| `@` | You |
+| `-`, `|` | Room walls |
 | `.` | Room floor |
 | `#` | Hallway |
 | `+` | Door |
-| `X`, `G`, `T`, `D` | Monsters |
+| `O` | Open stairway |
+| `X`, `G`, `T`, `W`, `D` | Monsters |
