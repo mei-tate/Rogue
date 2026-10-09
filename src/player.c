@@ -22,9 +22,6 @@ Player *playerSetUp(){
     newPlayer->exp = 0;
     newPlayer->alive = 1;
 
-    mvaddch(newPlayer->position->y, newPlayer->position->x, '@');
-    move(newPlayer->position->y, newPlayer->position->x);
-
     return newPlayer;
 }
 
@@ -84,11 +81,15 @@ int checkPosition(Position position, Player *user, Level *level){
         case '+':
             movePlayer(position, user, level);
             break;
+        case 'O':
+            movePlayer(position, user, level);
+            level->transitionRequested = 1;
+            break;
         case 'X':
         case 'G':
         case 'T':
         case 'D':
-            combat(user, getMonsterAt(&position, level));
+            combat(user, getMonsterAt(&position, level), level);
             break;
         default:
             break;

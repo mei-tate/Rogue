@@ -23,6 +23,20 @@ int addMonster(Level *level){
         }
     }
 
+    // Every level needs at least one monster so the exit can appear on a death.
+    if (level->numOfMonsters == 0) {
+        Monster *monster = selectMonster(level->level);
+        if (monster == NULL || !setStartingPosition(monster, level->rooms[0])) {
+            if (monster != NULL) {
+                free(monster->position);
+                free(monster);
+            }
+            return 0;
+        }
+        monster->room = level->rooms[0];
+        level->monsters[level->numOfMonsters++] = monster;
+    }
+
     return 1;
 }
 

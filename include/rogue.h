@@ -10,6 +10,7 @@
 #define COLOR_PAIR_HIGHLIGHT 3
 #define COLOR_PAIR_STATUS 4
 #define COLOR_PAIR_HEALTH 5
+#define MAX_GAME_LEVELS 6
 
 /************ Struct Definitions ***************/
 
@@ -21,6 +22,7 @@ typedef struct Level{
     struct Monster **monsters;
     int numOfMonsters;
     int mapHeight;
+    int transitionRequested;
     struct Player *player;
 } Level;
 
@@ -79,7 +81,7 @@ void showHelpScreen(void);
 // Level and Map Setup Functions
 Level *createLevel(int level);
 char **saveLevelPositions();
-Room **roomSetUp();
+Room **roomSetUp(int level, int mapHeight, int mapWidth, int *roomCount);
 void freeLevel(Level *level);
 void freeLevelPositions(char **level, int height);
 
@@ -108,13 +110,13 @@ int killMonster(Monster *monster);
 
 
 // Combat Functions
-int combat(Player *player, Monster *monster);
+int combat(Player *player, Monster *monster, Level *level);
 
 
 // Game 
 typedef struct Game
 {
-    struct Level * levels[10];
+    struct Level * levels[MAX_GAME_LEVELS];
     int currentLevel;
 } Game;
 

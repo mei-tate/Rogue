@@ -69,7 +69,7 @@ int drawRoom(Room *room){
 };
 
 
-// Find a shortest route through empty cells/hallways. Walls and room interiors block it.
+// Find a shortest route through unused cells. Existing halls cannot be reused.
 int connectDoors(Position *door1, Position *door2){
     int height, width, cellCount, start, target, head = 0, tail = 0;
     int *queue = NULL, *parent = NULL;
@@ -95,7 +95,7 @@ int connectDoors(Position *door1, Position *door2){
     parent[start] = start;
     queue[tail++] = start;
 
-    // Breadth-first search: only blank cells and existing hallways may be crossed.
+    // Breadth-first search: corridors may cross only blank cells.
     while (head < tail && !found) {
         int current = queue[head++];
         int x = current % width;
@@ -109,7 +109,7 @@ int connectDoors(Position *door1, Position *door2){
             next = ny * width + nx;
             if (parent[next] != -1) continue;
             tile = mvinch(ny, nx) & A_CHARTEXT;
-            if (next != target && tile != ' ' && tile != '#') continue;
+            if (next != target && tile != ' ') continue;
             parent[next] = current;
             queue[tail++] = next;
             if (next == target) { found = 1; break; }
